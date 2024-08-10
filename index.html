@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>May sahod na!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 3px;
+            text-align: center;
+        }
+        .container {
+            max-width: 380px;
+            margin: auto;
+            border: 1px solid #ccc;
+            padding: 15px;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+        .input-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .input-group label {
+            flex: 4;
+            text-align: left;
+            margin-right: 20px;
+        }
+        .input-group .input-field {
+            flex: 2;
+            width: calc(100% - 50px); /* Adjusted width */
+            padding: 5px;
+            margin-top: 1px;
+            margin-bottom: 1px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 17px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .paycheck-summary {
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            margin-top: 20px;
+        }
+        .paycheck-summary h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        .result {
+            text-align: left;
+            padding-top: 10px;
+            border-top: 1px solid #ccc;
+        }
+        .result p {
+            margin: 9px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .result strong {
+            display: inline-block;
+            width: 1000px; /* Adjust as needed for longer labels */
+            text-align: right;
+            margin-right: 10px;
+        }
+        .result span {
+            display: inline-block;
+            width: calc(100% - 180px); /* Adjust as needed based on label width */
+            text-align: left;
+        }
+        h2 {
+            margin-bottom: 0;
+        }
+        .sub-title {
+            font-weight: normal;
+            margin-top: 3px;
+            margin-bottom: 15px;
+        }
+        /* GROSS Salary */
+        .result p:nth-of-type(1) span {
+            font-weight: bold;
+            color: black;
+        }
+        /* SSS */
+        .result p:nth-of-type(2) span {
+            font-weight: normal;
+            color: black; /* Changed color to black */
+        }
+        /* Pag-ibig */
+        .result p:nth-of-type(3) span {
+            font-weight: normal;
+            color: black; /* Changed color to black */
+        }
+        /* PhilHealth */
+        .result p:nth-of-type(4) span {
+            font-weight: normal;
+            color: black; /* Changed color to black */
+        }
+        /* total-deduction */
+        .result p:nth-of-type(5) span {
+            font-weight: bold;
+            color: red;
+        }
+        /* NET salary */
+        .result p:nth-of-type(6) span {
+            font-weight: bold;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>DaKASINS</h2>
+        <div class="sub-title">Paycheck Calculator v2024.06.01</div>
+        <form onsubmit="event.preventDefault(); calculateSalary();">
+            <div class="input-group">
+                <label for="days">Number of days worked:</label>
+                <input type="number" id="days" name="days" class="input-field" value="10" step="1">
+            </div>
+            <div class="input-group">
+                <label for="rate">Rate per day (PHP):</label>
+                <input type="number" id="rate" name="rate" class="input-field" value="550" step="50">
+            </div>
+            <div class="input-group">
+                <label for="sss">SSS Contribution:</label>
+                <select id="sss" name="sss" class="input-field" onchange="updateSSSLabel()">
+                    <option value="3.0">3.0%</option>
+                    <option value="3.5">3.5%</option>
+                    <option value="4.0">4.0%</option>
+                    <option value="4.5" selected>4.5%</option>
+                    <option value="5.0">5.0%</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="pagibig">Pag-ibig Contribution:</label>
+                <select id="pagibig" name="pagibig" class="input-field" onchange="updatePagibigLabel()">
+                    <option value="3.0" selected>3.0%</option>
+                    <option value="3.5">3.5%</option>
+                    <option value="4.0">4.0%</option>
+                    <option value="4.5">4.5%</option>
+                    <option value="5.0">5.0%</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="philhealth">PhilHealth Contribution:</label>
+                <input type="number" id="philhealth" name="philhealth" class="input-field" value="112.50" step="0.5">
+            </div>
+            <button type="submit">Calculate NET salary</button>
+        </form>
+
+        <div class="paycheck-summary">
+            <h3>Paycheck Summary</h3>
+            <div class="result">
+                <p><span>Gross Salary:</span> <span id="grosssalary"></span></p>
+                <p><span id="sssLabel">SSS (4.5%):</span> <span id="sssDeduction"></span></p>
+                <p><span id="pagibigLabel">Pag-ibig (3.0%):</span> <span id="pagibigDeduction"></span></p>
+                <p><span>PhilHealth (Fxd):</span> <span id="philhealthAmount"></span></p>
+                <p><span>Total deduction:</span> <span id="totalDeduction" class="total-deduction"></span></p>
+                <p><span>NET Salary:</span> <span id="netSalary"></span></p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function calculateSalary() {
+            // Get input values
+            var daysWorked = parseInt(document.getElementById('days').value);
+            var ratePerDay = parseFloat(document.getElementById('rate').value);
+            var sssContribution = parseFloat(document.getElementById('sss').value);
+            var pagibigContribution = parseFloat(document.getElementById('pagibig').value);
+            var philhealthAmount = parseFloat(document.getElementById('philhealth').value);
+            
+            // Calculate deductions
+            var grossSalary = (daysWorked * ratePerDay).toFixed(2);
+            var sssDeduction = ((grossSalary * (sssContribution / 100)).toFixed(2));
+            var pagibigDeduction = ((grossSalary * (pagibigContribution / 100)).toFixed(2));
+            var totalPhilhealth = philhealthAmount.toFixed(2);
+            var totalDeduction = (parseFloat(sssDeduction) + parseFloat(pagibigDeduction) + parseFloat(totalPhilhealth)).toFixed(2);
+            var netSalary = (grossSalary - totalDeduction).toFixed(2);
+            
+            // Display results
+            document.getElementById('grosssalary').textContent = 'PHP ' + grossSalary;
+            document.getElementById('sssDeduction').textContent = 'PHP ' + sssDeduction;
+            document.getElementById('pagibigDeduction').textContent = 'PHP ' + pagibigDeduction;
+            document.getElementById('philhealthAmount').textContent = 'PHP ' + totalPhilhealth;
+            document.getElementById('totalDeduction').textContent = 'PHP ' + totalDeduction;
+            document.getElementById('netSalary').textContent = 'PHP ' + netSalary;
+            
+            // Update labels
+            updateSSSLabel();
+            updatePagibigLabel();
+        }
+
+        function updateSSSLabel() {
+            var sssContribution = parseFloat(document.getElementById('sss').value);
+            document.getElementById('sssLabel').textContent = 'SSS (' + sssContribution.toFixed(1) + '%):';
+        }
+
+        function updatePagibigLabel() {
+            var pagibigContribution = parseFloat(document.getElementById('pagibig').value);
+            document.getElementById('pagibigLabel').textContent = 'Pag-ibig (' + pagibigContribution.toFixed(1) + '%):';
+        }
+
+        // Initial update of labels
+        updateSSSLabel();
+        updatePagibigLabel();
+
+    </script>
+
+</body>
+</html>
